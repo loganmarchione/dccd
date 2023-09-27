@@ -126,11 +126,12 @@ done
 # Script starts here
 ########################################
 
-touch $LOG_FILE
-echo "########################################" >> $LOG_FILE
-echo "# Starting!" >> $LOG_FILE
-echo "########################################" >> $LOG_FILE
-log_message "STATE: Starting!" 
+touch "$LOG_FILE"
+{
+  echo "########################################"
+  echo "# Starting!"
+  echo "########################################"
+} >> "$LOG_FILE"
 
 # Check if BASE_DIR is provided
 if [ -z "$BASE_DIR" ]; then
@@ -152,7 +153,7 @@ if [ -n "$EXCLUDE" ]; then
     log_message "INFO:  Will be excluding pattern $EXCLUDE"
 fi
 
-update_compose_files $BASE_DIR
+update_compose_files "$BASE_DIR"
 
 # Get list of directories to process
 #directories_to_process=$(find "$BASE_DIR" -type d ! -path "$BASE_DIR/.git" ! -path "$BASE_DIR/.git/*" ! -path "$BASE_DIR/$EXCLUDE" ! -path "$BASE_DIR/$EXCLUDE/*")
