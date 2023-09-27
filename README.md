@@ -8,7 +8,7 @@ Bash tool for Docker Compose that does Continous Deployment (DCCD)
 
 I run a small Kubernetes cluster at home where I use [Renovate](https://github.com/renovatebot/renovate) for dependency management and [Flux](https://github.com/fluxcd/flux2) for continuous deployment. Flux has spoiled me, but I've found nothing like it for my small Docker Compose setup (the stuff that isn't on K8s yet).
 
-DCCD is a bash script that is meant to run via crontab. It checks the specified repo and branch for changes, compares the commits on the remote and local repos, and updates the local repo as needed.
+DCCD is a bash script that is meant to run via crontab. It checks the specified repo and branch for changes, compares the commits on the remote and local repos, and if necessary, updates the local repo and redeploys your Docker Compose applications.
 
 ## Requirements
 
