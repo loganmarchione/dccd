@@ -84,6 +84,8 @@ usage() {
       -h              Show this help message
       -l <path>       Specify the path to the log file (default: /tmp/dccd.log)
       -x <path>       Exclude directories matching the specified pattern (relative to the base directory)
+      
+    Example: ./dccd.sh -b master -d /path/to/git_repo -x ignore_this_directory
 
 "
     exit 1
