@@ -29,7 +29,7 @@ update_compose_files() {
     fi
 
     # Check if there are any changes in the Git repository
-    if ! git fetch origin;
+    if ! git fetch origin; then
         log_message "ERROR: Unable to fetch changes from the remote repository (the server may be offline or unreachable)"
         exit 1
     fi
@@ -51,7 +51,7 @@ update_compose_files() {
 	log_message "STATE: Hashes don't match, updating..."
 
         # Pull any changes in the Git repository
-        if ! git pull --quiet origin "$REMOTE_BRANCH";
+        if ! git pull --quiet origin "$REMOTE_BRANCH"; then
             log_message "ERROR: Unable to pull changes from the remote repository (the server may be offline or unreachable)"
             exit 1
         fi
