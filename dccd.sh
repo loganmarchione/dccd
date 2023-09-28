@@ -4,8 +4,9 @@
 # Default configuration values
 ########################################
 BASE_DIR=""                     # Initialize empty variable
-REMOTE_BRANCH="main"            # Default remote branch name
 LOG_FILE="/tmp/dccd.log"        # Default log file name
+PRUNE=0                         # Default prune setting
+REMOTE_BRANCH="main"            # Default remote branch name
 
 ########################################
 # Functions
@@ -60,15 +61,26 @@ update_compose_files() {
   	    # Extract the directory containing the file
   	    dir=$(dirname "$file")
 
-    	# Check if the directory matches the exclusion pattern
-    	    if [[ "$dir" != *"$EXCLUDE"* ]]; then
-                log_message "STATE: Redeploying compose file for $file"
-                docker compose -f "$file" up -d --quiet-pull
-    	    fi
+	    # If EXCLUDE is set
+	    if [ -n "$EXCLUDE" ]; then
+	      # If the directory does not contain the exclude pattern
+	      if [[ "$dir" != *"$EXCLUDE"* ]]; then
+                  log_message "STATE: Redeploying compose file for $file"
+                  docker compose -f "$file" up -d --quiet-pull
+              fi
+	    else
+		log_message "STATE: Redeploying compose file for $file"
+		docker compose -f "$file" up -d --quiet-pull
+            fi
         done
-
     else
         log_message "STATE: Hashes match, so nothing to do"
+    fi
+
+    # Check if PRUNE is provided
+    if [ $PRUNE -eq 1 ]; then
+        log_message "STATE: Pruning images"
+	docker image prune --all --force
     fi
 
     log_message "STATE: Done!"
@@ -80,12 +92,13 @@ usage() {
 
     Options:
       -b <name>       Specify the remote branch to track (default: main)
-      -d <path>       Specify the base directory of the git repository  (required)
+      -d <path>       Specify the base directory of the git repository (required)
       -h              Show this help message
       -l <path>       Specify the path to the log file (default: /tmp/dccd.log)
+      -p              Specify if you want to prune docker images (default: don't prune)
       -x <path>       Exclude directories matching the specified pattern (relative to the base directory)
       
-    Example: ./dccd.sh -b master -d /path/to/git_repo -x ignore_this_directory
+    Example: /path/to/dccd.sh -b master -d /path/to/git_repo -l /tmp/dccd.txt -p -x ignore_this_directory
 
 "
     exit 1
@@ -95,7 +108,7 @@ usage() {
 # Options
 ########################################
 
-while getopts ":b:d:hl:x:" opt; do
+while getopts ":b:d:hl:px:" opt; do
     case "$opt" in
         b)
             REMOTE_BRANCH="$OPTARG"
@@ -109,6 +122,9 @@ while getopts ":b:d:hl:x:" opt; do
 
         l)
             LOG_FILE="$OPTARG"
+            ;;
+	p)
+	    PRUNE=1
             ;;
         x)
             EXCLUDE="$OPTARG"
@@ -144,23 +160,16 @@ else
 fi
 
 # Check if REMOTE_BRANCH is provided
-if [ -z "$BASE_DIR" ]; then
-    log_message "STATE: The remote branch isn't specified, so using $REMOTE_BRANCH"
+if [ -z "$REMOTE_BRANCH" ]; then
+    log_message "INFO:  The remote branch isn't specified, so using $REMOTE_BRANCH"
 else
     log_message "INFO:  The remote branch is set to $REMOTE_BRANCH"
 fi
 
-# Check if directory is excluded
+# Check if EXCLUDE is provided
 if [ -n "$EXCLUDE" ]; then
     log_message "INFO:  Will be excluding pattern $EXCLUDE"
 fi
 
 update_compose_files "$BASE_DIR"
 
-# Get list of directories to process
-#directories_to_process=$(find "$BASE_DIR" -type d ! -path "$BASE_DIR/.git" ! -path "$BASE_DIR/.git/*" ! -path "$BASE_DIR/$EXCLUDE" ! -path "$BASE_DIR/$EXCLUDE/*")
-
-#IFS=$'\n'  # Set the field separator to newline to handle directory names with spaces
-#for dir in $directories_to_process; do
-#   log_message "INFO:  Processing $dir"
-#done

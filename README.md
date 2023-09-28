@@ -21,22 +21,23 @@ Docker Compose files will need to be named `docker-compose.yml` or `docker-compo
 The script is meant to run via crontab. The example below runs every 30th minutes (i.e., XX:00 and XX:30).
 
 ```
-*/30 * * * * /path/to/dccd.sh -b master -d /path/to/git_repo -x ignore_this_directory
+*/30 * * * * /path/to/dccd.sh -b master -d /path/to/git_repo -l /tmp/dccd.txt -p -x ignore_this_directory
 ```
 
 Usage examples are below.
 
 ```
-    Usage:   ./dccd.sh [OPTIONS]
+    Usage: ./dccd.sh [OPTIONS]
 
     Options:
       -b <name>       Specify the remote branch to track (default: main)
-      -d <path>       Specify the base directory of the git repository  (required)
+      -d <path>       Specify the base directory of the git repository (required)
       -h              Show this help message
       -l <path>       Specify the path to the log file (default: /tmp/dccd.log)
+      -p              Specify if you want to prune docker images (default: don't prune)
       -x <path>       Exclude directories matching the specified pattern (relative to the base directory)
       
-    Example: ./dccd.sh -b master -d /path/to/git_repo -x ignore_this_directory
+    Example: /path/to/dccd.sh -b master -d /path/to/git_repo -l /tmp/dccd.txt -p -x ignore_this_directory
 ```
 
 ## Alternatives
