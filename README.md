@@ -14,7 +14,9 @@ DCCD is a bash script that is meant to run via crontab. It checks the specified 
 
 You'll obviously need to have `git` and `docker compose` installed.
 
-Docker Compose files will need to be named `docker-compose.yml` or `docker-compose.yaml`
+Docker Compose files will need to be named `docker-compose.yml` or `docker-compose.yaml`.
+
+The script will redeploy all Docker Compose files if it finds the remote repo has changed (not just the individual files that have changed). Git is the source of truth.
 
 ## Usage
 
