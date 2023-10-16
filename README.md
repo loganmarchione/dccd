@@ -45,5 +45,5 @@ Usage examples are below.
 ## Alternatives
 
 * What about [Portainer](https://github.com/portainer/portainer)? Portainer Business Edition does [gitops](https://www.portainer.io/gitops-automation), but I'm trying to remove my dependency on Portainer.
-* What about [Watchtower](https://github.com/containrrr/watchtower)? Watchtower only works if the image tag is `latest`, and it checks for updates against a container image repo directly, not against Docker Compose files in a git repo.
+* What about [Watchtower](https://github.com/containrrr/watchtower)? Watchtower only works if the image tag is `latest`, and it checks for updates against a container image repo directly (e.g., DockerHub), not against Docker Compose files in a git repo.
 * What about [Harbormaster](https://gitlab.com/stavros/harbormaster)? This comes close, but Harbormaster needs a specific configuration and the directory structure of the Docker Compose files has to be setup a specific way.
