@@ -20,7 +20,7 @@ The script will redeploy all Docker Compose files if it finds the remote repo ha
 
 ## Usage
 
-The script is meant to run via crontab. The example below runs every 30th minutes (i.e., XX:00 and XX:30).
+The script is meant to run via crontab. The example below runs every 30th minute (i.e., XX:00 and XX:30).
 
 ```
 */30 * * * * /path/to/dccd.sh -b master -d /path/to/git_repo -l /tmp/dccd.txt -p -x ignore_this_directory
