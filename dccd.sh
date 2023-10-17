@@ -57,7 +57,7 @@ update_compose_files() {
             exit 1
         fi
 
-	find . -type f \( -name 'docker-compose.yml' -o -name 'docker-compose.yaml' \) | sort | while IFS= read -r file; do
+	find . -type f \( -name 'docker-compose.yml' -o -name 'docker-compose.yaml' -o -name 'compose.yaml' -o -name 'compose.yml' \) | sort | while IFS= read -r file; do
   	    # Extract the directory containing the file
   	    dir=$(dirname "$file")
 
