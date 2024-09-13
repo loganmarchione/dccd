@@ -17,6 +17,7 @@ You'll obviously need to have `git` and `docker compose` installed.
 Docker Compose files will need to be named `docker-compose.yml`, `docker-compose.yaml`, `compose.yml` or `compose.yaml`.
 
 The script will redeploy all Docker Compose files if it finds the remote repo has changed (not just the individual files that have changed). Git is the source of truth.
+If graceful mode is set, it will only restart the containers that needs to be redeployed. It uses docker compose --dry-run to check if it needs it.
 
 ## Usage
 
@@ -37,6 +38,7 @@ Usage examples are below.
       -h              Show this help message
       -l <path>       Specify the path to the log file (default: /tmp/dccd.log)
       -p              Specify if you want to prune docker images (default: don't prune)
+      -g              Graceful, only restart containers that will be recreated
       -x <path>       Exclude directories matching the specified pattern (relative to the base directory)
       
     Example: /path/to/dccd.sh -b master -d /path/to/git_repo -l /tmp/dccd.txt -p -x ignore_this_directory

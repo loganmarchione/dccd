@@ -6,15 +6,19 @@
 BASE_DIR=""                     # Initialize empty variable
 LOG_FILE="/tmp/dccd.log"        # Default log file name
 PRUNE=0                         # Default prune setting
+GRACEFUL=0
 REMOTE_BRANCH="main"            # Default remote branch name
+TMPRESTART="/tmp/dccd.restart"
 
 ########################################
 # Functions
 ########################################
+
 log_message() {
     local message="$1"
     echo "$(date +'%Y-%m-%d %H:%M:%S') - $message" | tee -a "$LOG_FILE"
 }
+
 
 update_compose_files() {
     local dir="$1"
@@ -66,11 +70,31 @@ update_compose_files() {
 	      # If the directory does not contain the exclude pattern
 	      if [[ "$dir" != *"$EXCLUDE"* ]]; then
                   log_message "STATE: Redeploying compose file for $file"
-                  docker compose -f "$file" up -d --quiet-pull
+                       if [ $GRACEFUL -eq 1 ]; then
+                           docker compose -f "$file" up -d --dry-run &> $TMPRESTART
+                              if grep -q "Recreate" $TMPRESTART; then
+                                   log_message "GRACEFUL: Redeploying compose file for $file"
+                                   docker compose -f "$file" up -d --quiet-pull
+                            else
+                              log_message "GRACEFUL: Skipping Redeploying compose file for $file (no change)"
+                            fi
+			else
+		  		docker compose -f "$file" up -d --quiet-pull
+			fi
               fi
 	    else
-		log_message "STATE: Redeploying compose file for $file"
-		docker compose -f "$file" up -d --quiet-pull
+		if [ $GRACEFUL -eq 1 ]; then
+                    docker compose -f "$file" up -d --dry-run &> $TMPRESTART
+                         if grep -q "Recreate" $TMPRESTART; then
+                              log_message "GRACEFUL: Redeploying compose file for $file"
+                              docker compose -f "$file" up -d --quiet-pull
+                         else
+                              log_message "GRACEFUL: Skipping Redeploying compose file for $file (no change)"
+                         fi
+		else
+		  log_message "STATE: Redeploying compose file for $file"
+                  docker compose -f "$file" up -d --quiet-pull
+		fi
             fi
         done
     else
@@ -81,6 +105,11 @@ update_compose_files() {
     if [ $PRUNE -eq 1 ]; then
         log_message "STATE: Pruning images"
 	docker image prune --all --force
+    fi
+
+    # Cleanup graceful file.
+    if [ $GRACEFUL -eq 1 ]; then
+        rm -f $TMPRESTART
     fi
 
     log_message "STATE: Done!"
@@ -96,6 +125,7 @@ usage() {
       -h              Show this help message
       -l <path>       Specify the path to the log file (default: /tmp/dccd.log)
       -p              Specify if you want to prune docker images (default: don't prune)
+      -g              Graceful, only restart containers that will be recreated
       -x <path>       Exclude directories matching the specified pattern (relative to the base directory)
       
     Example: /path/to/dccd.sh -b master -d /path/to/git_repo -l /tmp/dccd.txt -p -x ignore_this_directory
@@ -108,7 +138,7 @@ usage() {
 # Options
 ########################################
 
-while getopts ":b:d:hl:px:" opt; do
+while getopts ":b:d:hl:px:g" opt; do
     case "$opt" in
         b)
             REMOTE_BRANCH="$OPTARG"
@@ -125,6 +155,9 @@ while getopts ":b:d:hl:px:" opt; do
             ;;
 	p)
 	    PRUNE=1
+            ;;
+        g)
+            GRACEFUL=1
             ;;
         x)
             EXCLUDE="$OPTARG"
