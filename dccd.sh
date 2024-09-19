@@ -128,7 +128,7 @@ usage() {
       -p              Specify if you want to prune docker images (default: don't prune)
       -x <path>       Exclude directories matching the specified pattern (relative to the base directory)
       
-    Example: /path/to/dccd.sh -b master -d /path/to/git_repo -l /tmp/dccd.txt -p -x ignore_this_directory
+    Example: /path/to/dccd.sh -b master -d /path/to/git_repo -g -l /tmp/dccd.txt -p -x ignore_this_directory
 
 "
     exit 1
