@@ -16,8 +16,8 @@ You'll obviously need to have `git` and `docker compose` installed.
 
 Docker Compose files will need to be named `docker-compose.yml`, `docker-compose.yaml`, `compose.yml` or `compose.yaml`.
 
-The script will redeploy all Docker Compose files if it finds the remote repo has changed (not just the individual files that have changed). Git is the source of truth.
-If graceful mode is set, it will only restart the containers that needs to be redeployed. It uses docker compose --dry-run to check if it needs it.
+The script will redeploy Docker Compose files if it finds the remote repo has changed. Git is the source of truth.
+If graceful mode is set, it will only restart the containers that need to be redeployed. It uses `docker compose --dry-run` to check if a container needs to be redeployed.
 
 ## Usage
 
