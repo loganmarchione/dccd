@@ -6,9 +6,9 @@
 BASE_DIR=""                     # Initialize empty variable
 LOG_FILE="/tmp/dccd.log"        # Default log file name
 PRUNE=0                         # Default prune setting
-GRACEFUL=0
+GRACEFUL=0                      # Default graceful setting
+TMPRESTART="/tmp/dccd.restart"  # Default log file for graceful setting
 REMOTE_BRANCH="main"            # Default remote branch name
-TMPRESTART="/tmp/dccd.restart"
 
 ########################################
 # Functions
@@ -138,7 +138,7 @@ usage() {
 # Options
 ########################################
 
-while getopts ":b:d:hl:px:g" opt; do
+while getopts ":b:d:ghl:px:" opt; do
     case "$opt" in
         b)
             REMOTE_BRANCH="$OPTARG"
@@ -146,18 +146,17 @@ while getopts ":b:d:hl:px:g" opt; do
         d)
             BASE_DIR="$OPTARG"
             ;;
+        g)
+            GRACEFUL=1
+            ;;
         h)
             usage
             ;;
-
         l)
             LOG_FILE="$OPTARG"
             ;;
 	p)
 	    PRUNE=1
-            ;;
-        g)
-            GRACEFUL=1
             ;;
         x)
             EXCLUDE="$OPTARG"
