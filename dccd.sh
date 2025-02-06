@@ -71,7 +71,6 @@ update_compose_files() {
             if [ -n "$EXCLUDE" ]; then
                 # If the directory does not contain the exclude pattern
                 if [[ "$dir" != *"$EXCLUDE"* ]]; then
-                    log_message "STATE: Redeploying compose file for $file"
                     if [ $GRACEFUL -eq 1 ]; then
                         docker compose -f "$file" up -d --dry-run &> $TMPRESTART
                         if grep -q "Recreate" $TMPRESTART; then
@@ -81,6 +80,7 @@ update_compose_files() {
                             log_message "GRACEFUL: Skipping Redeploying compose file for $file (no change)"
                         fi
                     else
+                        log_message "STATE: Redeploying compose file for $file"
                         docker compose -f "$file" up -d --quiet-pull
                     fi
                 fi
