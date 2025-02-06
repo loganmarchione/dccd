@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.1] - 2025-02-06
+
+- Clean up code thanks to [@boc-the-git](https://github.com/boc-the-git) in https://github.com/loganmarchione/dccd/pull/7
+
 ## [1.0.0] - 2024-09-19
 
 - Initial tagged release
