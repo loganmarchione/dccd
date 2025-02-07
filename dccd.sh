@@ -63,6 +63,22 @@ update_compose_files() {
             exit 1
         fi
 
+        redeploy_compose_file() {
+            local file=$1
+            if [ $GRACEFUL -eq 1 ]; then
+                docker compose -f "$file" up -d --dry-run &> $TMPRESTART
+                if grep -q "Recreate" $TMPRESTART; then
+                    log_message "GRACEFUL: Redeploying compose file for $file"
+                    docker compose -f "$file" up -d --quiet-pull
+                else
+                    log_message "GRACEFUL: Skipping Redeploying compose file for $file (no change)"
+                fi
+            else
+                log_message "STATE: Redeploying compose file for $file"
+                docker compose -f "$file" up -d --quiet-pull
+            fi
+        }
+
         find . -type f \( -name 'docker-compose.yml' -o -name 'docker-compose.yaml' -o -name 'compose.yaml' -o -name 'compose.yml' \) | sort | while IFS= read -r file; do
             # Extract the directory containing the file
             dir=$(dirname "$file")
@@ -71,32 +87,10 @@ update_compose_files() {
             if [ -n "$EXCLUDE" ]; then
                 # If the directory does not contain the exclude pattern
                 if [[ "$dir" != *"$EXCLUDE"* ]]; then
-                    if [ $GRACEFUL -eq 1 ]; then
-                        docker compose -f "$file" up -d --dry-run &> $TMPRESTART
-                        if grep -q "Recreate" $TMPRESTART; then
-                            log_message "GRACEFUL: Redeploying compose file for $file"
-                            docker compose -f "$file" up -d --quiet-pull
-                        else
-                            log_message "GRACEFUL: Skipping Redeploying compose file for $file (no change)"
-                        fi
-                    else
-                        log_message "STATE: Redeploying compose file for $file"
-                        docker compose -f "$file" up -d --quiet-pull
-                    fi
+                    redeploy_compose_file "$file"
                 fi
             else
-                if [ $GRACEFUL -eq 1 ]; then
-                    docker compose -f "$file" up -d --dry-run &> $TMPRESTART
-                    if grep -q "Recreate" $TMPRESTART; then
-                        log_message "GRACEFUL: Redeploying compose file for $file"
-                        docker compose -f "$file" up -d --quiet-pull
-                    else
-                        log_message "GRACEFUL: Skipping Redeploying compose file for $file (no change)"
-                    fi
-                else
-                    log_message "STATE: Redeploying compose file for $file"
-                    docker compose -f "$file" up -d --quiet-pull
-                fi
+                redeploy_compose_file "$file"
             fi
         done
     else
