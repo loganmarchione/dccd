@@ -36,7 +36,7 @@ update_compose_files() {
     fi
 
     # Check if there are any changes in the Git repository
-    if ! git fetch origin; then
+    if ! git fetch --quiet origin; then
         log_message "ERROR: Unable to fetch changes from the remote repository (the server may be offline or unreachable)"
         exit 1
     fi
