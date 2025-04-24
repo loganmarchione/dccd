@@ -35,13 +35,14 @@ Usage examples are below.
     Options:
       -b <name>       Specify the remote branch to track (default: main)
       -d <path>       Specify the base directory of the git repository (required)
-      -g              Graceful, only restart containers that will be recreated
+      -g              Graceful, only restart containers that will be recreated (optional)
       -h              Show this help message
       -l <path>       Specify the path to the log file (default: /tmp/dccd.log)
+      -o <options>    Additional options to pass directly to `docker compose...` (optional)
       -p              Specify if you want to prune docker images (default: don't prune)
-      -x <path>       Exclude directories matching the specified pattern (relative to the base directory)
+      -x <path>       Exclude directories matching the specified pattern (optional - relative to the base directory)
       
-    Example: /path/to/dccd.sh -b master -d /path/to/git_repo -g -l /tmp/dccd.txt -p -x ignore_this_directory
+    Example: /path/to/dccd.sh -b master -d /path/to/git_repo -g -l /tmp/dccd.txt -o "--env-file /path/to/my.env" -p -x ignore_this_directory
 ```
 
 ## Alternatives
