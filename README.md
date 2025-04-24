@@ -24,7 +24,7 @@ If graceful mode is set, it will only restart the containers that need to be red
 The script is meant to run via crontab. The example below runs every 30th minute (i.e., XX:00 and XX:30).
 
 ```
-*/30 * * * * /path/to/dccd.sh -b master -d /path/to/git_repo -g -l /tmp/dccd.txt -o "--env-file /path/to/my.env"-p -x ignore_this_directory
+*/30 * * * * /path/to/dccd.sh -b master -d /path/to/git_repo -g -l /tmp/dccd.txt -o "--env-file /path/to/my.env" -p -x ignore_this_directory
 ```
 
 Usage examples are below.
