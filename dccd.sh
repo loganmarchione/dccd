@@ -9,6 +9,7 @@ PRUNE=0                        # Default prune setting
 GRACEFUL=0                     # Default graceful setting
 TMPRESTART="/tmp/dccd.restart" # Default log file for graceful setting
 REMOTE_BRANCH="main"           # Default remote branch name
+COMPOSE_OPTS=""                # Additional options for docker compose
 
 ########################################
 # Functions
@@ -65,17 +66,28 @@ update_compose_files() {
 
         redeploy_compose_file() {
             local file=$1
+
+            # Build the command based on whether we have extra options
+            run_compose_command() {
+                local cmd_args="$1"
+                if [ -n "$COMPOSE_OPTS" ]; then
+                    eval "docker compose $COMPOSE_OPTS $cmd_args"
+                else
+                    eval "docker compose $cmd_args"
+                fi
+            }
+
             if [ $GRACEFUL -eq 1 ]; then
-                docker compose -f "$file" up -d --dry-run &> $TMPRESTART
+                run_compose_command "-f \"$file\" up -d --dry-run" &> $TMPRESTART
                 if grep -q "Recreate" $TMPRESTART; then
                     log_message "GRACEFUL: Redeploying compose file for $file"
-                    docker compose -f "$file" up -d --quiet-pull
+                    run_compose_command "-f \"$file\" up -d --quiet-pull"
                 else
                     log_message "GRACEFUL: Skipping Redeploying compose file for $file (no change)"
                 fi
             else
                 log_message "STATE: Redeploying compose file for $file"
-                docker compose -f "$file" up -d --quiet-pull
+                run_compose_command "-f \"$file\" up -d --quiet-pull"
             fi
         }
 
@@ -118,13 +130,14 @@ usage() {
     Options:
       -b <name>       Specify the remote branch to track (default: main)
       -d <path>       Specify the base directory of the git repository (required)
-      -g              Graceful, only restart containers that will be recreated
+      -g              Graceful, only restart containers that will be recreated (optional)
       -h              Show this help message
       -l <path>       Specify the path to the log file (default: /tmp/dccd.log)
+      -o <options>    Additional options to pass directly to \`docker compose...\` (optional)
       -p              Specify if you want to prune docker images (default: don't prune)
-      -x <path>       Exclude directories matching the specified pattern (relative to the base directory)
+      -x <path>       Exclude directories matching the specified pattern (optional - relative to the base directory)
       
-    Example: /path/to/dccd.sh -b master -d /path/to/git_repo -g -l /tmp/dccd.txt -p -x ignore_this_directory
+    Example: /path/to/dccd.sh -b master -d /path/to/git_repo -g -l /tmp/dccd.txt -o \"--env-file /path/to/my.env\" -p -x ignore_this_directory
 
 "
     exit 1
@@ -134,7 +147,7 @@ usage() {
 # Options
 ########################################
 
-while getopts ":b:d:ghl:px:" opt; do
+while getopts ":b:d:ghl:o:px:" opt; do
     case "$opt" in
     b)
         REMOTE_BRANCH="$OPTARG"
@@ -150,6 +163,9 @@ while getopts ":b:d:ghl:px:" opt; do
         ;;
     l)
         LOG_FILE="$OPTARG"
+        ;;
+    o)
+        COMPOSE_OPTS="$OPTARG"
         ;;
     p)
         PRUNE=1
@@ -192,6 +208,11 @@ if [ -z "$REMOTE_BRANCH" ]; then
     log_message "INFO:  The remote branch isn't specified, so using $REMOTE_BRANCH"
 else
     log_message "INFO:  The remote branch is set to $REMOTE_BRANCH"
+fi
+
+# Check if COMPOSE_OPTS is provided
+if [ -n "$COMPOSE_OPTS" ]; then
+    log_message "INFO:  Using additional docker compose options: $COMPOSE_OPTS"
 fi
 
 # Check if EXCLUDE is provided
