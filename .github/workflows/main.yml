@@ -1,4 +1,4 @@
-name: Shellcheck
+name: Lint
 
 on:
   push:
