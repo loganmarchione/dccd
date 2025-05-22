@@ -1,6 +1,6 @@
 # dccd
 
-[![Shellcheck](https://github.com/loganmarchione/dccd/actions/workflows/main.yml/badge.svg)](https://github.com/loganmarchione/dccd/actions/workflows/main.yml)
+[![Lint](https://github.com/loganmarchione/dccd/actions/workflows/main.yml/badge.svg)](https://github.com/loganmarchione/dccd/actions/workflows/main.yml)
 
 Bash tool for Docker Compose that does Continous Deployment (DCCD)
 
