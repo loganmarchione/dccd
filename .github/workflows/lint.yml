@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
-    name: Lint
+  shellcheck:
+    name: Shellcheck
 
     runs-on: ubuntu-latest
 
